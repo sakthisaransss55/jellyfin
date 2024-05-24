@@ -21,6 +21,19 @@ spec:
         ports:
         - containerPort: 8096
 
+        volumeMounts:
+        - name: jellyfinconfig
+          mountPath: /config
+        - name: jellyfinmedia
+          mountPath: /data
+      volumes:
+      - name: jellyfinconfig
+        persistentVolumeClaim:
+          claimName: jellyfin-config-persistent-volume-claim
+      - name: jellyfinmedia
+        persistentVolumeClaim:
+          claimName: jellyfin-media-persistent-volume-claim
+
 ---
 apiVersion: v1
 kind: Service
@@ -38,7 +51,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: jellyfin-persistent-volume
+  name: jellyfin-media-persistent-volume
 spec:
   capacity:
     storage: 100Gi
@@ -46,17 +59,48 @@ spec:
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Recycle
-  storageClassName: jellyfin-storage-class
+  storageClassName: jellyfin-media-storage-class
   hostPath:
-    path: /home/sakthi/kubestorage/media
+    path: /home/sakthi/kubestorage/jellyfin/media
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: jellyfin-persistent-volume-claim
+  name: jellyfin-media-persistent-volume-claim
 spec:
-  storageClassName: jellyfin-storage-class
+  storageClassName: jellyfin-media-storage-class
+  resources:
+    requests:
+      storage: 100Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-config-persistent-volume
+spec:
+  capacity:
+    storage: 100Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: jellyfin-config-storage-class
+  hostPath:
+    path: /home/sakthi/kubestorage/jellyfin/config
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-config-persistent-volume-claim
+spec:
+  storageClassName: jellyfin-config-storage-class
   resources:
     requests:
       storage: 100Gi
