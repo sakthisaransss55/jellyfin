@@ -16,7 +16,7 @@ spec:
         image: linuxserver/jellyfin
         resources:
           limits:
-            memory: "500Mi"
+            memory: "1500Mi"
             cpu: "500m"
         ports:
         - containerPort: 8096
